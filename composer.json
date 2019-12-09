@@ -1,0 +1,12 @@
+{
+    "name": "adrianolaselva/php-poc-rdkafka",
+    "authors": [
+        {
+            "name": "Adriano M. La Selva",
+            "email": "adriano.selva@picpay.com"
+        }
+    ],
+    "require": {
+        "enqueue/rdkafka": "^0.9.15"
+    }
+}

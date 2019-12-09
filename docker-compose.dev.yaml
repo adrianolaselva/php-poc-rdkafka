@@ -40,7 +40,7 @@ services:
         networks:
             - stack
     rdkafka-poc-consumer:
-        container_name: rdkafka-poc
+        container_name: rdkafka-poc-consume
         build: ./
         restart: always
         command: php consumer.php

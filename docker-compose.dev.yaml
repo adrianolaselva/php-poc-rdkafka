@@ -1,5 +1,35 @@
 version: '3.3'
 services:
+    rdkafka-poc-zookeeper:
+        container_name: rdkafka-zookeeper
+        image: confluentinc/cp-zookeeper:latest
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        volumes:
+            - data-rdkafka-poc-zookeper:/var/lib/zookeeper/data
+            - data-rdkafka-poc-zookeper-logs:/var/lib/zookeeper/log
+        networks:
+            - stack
+    rdkafka-poc-kafka:
+        container_name: rdkafka-kafka
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - rdkafka-poc-zookeeper
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_ZOOKEEPER_CONNECT: rdkafka-zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://rdkafka-kafka:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+        ports:
+            - 9092:9092
+        volumes:
+            - data-rdkafka-poc-kafka:/var/lib/kafka/data
+        networks:
+            - stack
     rdkafka-poc:
         container_name: rdkafka-poc
         build: ./
@@ -9,4 +39,19 @@ services:
             - .env
         networks:
             - stack
+    rdkafka-poc-consumer:
+        container_name: rdkafka-poc
+        build: ./
+        restart: always
+        command: php consumer.php
+        volumes:
+            - ./:/app
+        env_file:
+            - .env
+        networks:
+            - stack
 networks: {stack: {}}
+volumes:
+    data-rdkafka-poc-kafka:
+    data-rdkafka-poc-zookeper:
+    data-rdkafka-poc-zookeper-logs:
